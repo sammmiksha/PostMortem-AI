@@ -5,7 +5,7 @@
 }
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
+import json
 from app.schemas.incident import IncidentRequest
 from app.models.report import IncidentReport
 from app.database.dependency import get_db
@@ -29,10 +29,10 @@ def analyze_incident(
     )
 
     report = IncidentReport(
-        title=request.title,
-        incident_details=request.incident_details,
-        ai_report=report_text
-    )
+    title=request.title,
+    incident_details=request.incident_details,
+    ai_report=json.dumps(report_text)
+)
 
     db.add(report)
     db.commit()
@@ -40,7 +40,7 @@ def analyze_incident(
 
     return {
         "id": report.id,
-        "report": report.ai_report
+        "report": report_text
     }
 
 

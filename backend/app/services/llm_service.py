@@ -1,27 +1,57 @@
-# services/llm_service.py
-from dotenv import load_dotenv
-import os
-from openai import OpenAI
-load_dotenv()
+from ollama import chat
+import json
 
-client = OpenAI(api_key="YOUR_KEY")
 
 class LLMService:
 
-    def analyze_incident(self, incident_details):
+    def analyze_incident(self, incident_details: str):
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
+        prompt = f"""
+You are a Senior Site Reliability Engineer.
+
+Analyze the incident.
+
+Return ONLY valid JSON.
+
+DO NOT return explanations.
+DO NOT return markdown.
+DO NOT return code fences.
+
+Required schema:
+
+{{
+    "summary": "string",
+    "root_cause": "string",
+    "impact": "string",
+    "recommendations": [
+        "string"
+    ]
+}}
+
+Incident:
+{incident_details}
+"""
+
+        response = chat(
+            model="qwen2.5:3b",
             messages=[
                 {
-                    "role":"system",
-                    "content":"You are an incident response expert."
-                },
-                {
-                    "role":"user",
-                    "content":incident_details
+                    "role": "user",
+                    "content": prompt
                 }
-            ]
+            ],
+            format="json"
         )
 
-        return response.choices[0].message.content
+        content = response["message"]["content"]
+
+        try:
+            return json.loads(content)
+
+        except Exception:
+            return {
+                "summary": "Failed to parse model output",
+                "root_cause": "",
+                "impact": "",
+                "recommendations": []
+            }

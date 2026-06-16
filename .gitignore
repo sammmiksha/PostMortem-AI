@@ -1,4 +1,29 @@
+# --- Environment Variables & Secrets ---
 .env
-__pycache__/
-*.pyc
+.env.*
+!.env.example
+
+# --- Python Virtual Environments ---
 venv/
+.venv/
+env/
+ENV/
+
+# --- Python Caching ---
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Databases (SQLite local files) ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- IDEs and Editors ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
