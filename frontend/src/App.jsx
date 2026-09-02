@@ -34,11 +34,18 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
   const [preventionLoading, setPreventionLoading] = useState(false);
   const [artifactTab, setArtifactTab] = useState("test");
 
-  // Load Part 3 Pattern Analytics when tab switches to memory
+  // Part 5 Analytics & Integrations state
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [jiraNotice, setJiraNotice] = useState(null);
+  const [slackNotice, setSlackNotice] = useState(null);
+  const [currentUser, setCurrentUser] = useState({ name: "Samiksha Patil", email: "engineer@company.com", role: "Engineer" });
+
   useEffect(() => {
     if (activeTab === "memory") {
       fetchPatterns();
       runMemorySearch();
+    } else if (activeTab === "analytics") {
+      fetchAnalytics();
     }
   }, [activeTab]);
 
@@ -142,6 +149,42 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
     a.click();
   };
 
+  // Handlers for Part 5: Analytics & Integrations
+  const fetchAnalytics = async () => {
+    try {
+      const response = await api.get("/api/analytics/metrics");
+      setAnalyticsData(response.data);
+    } catch (error) {
+      console.error("Analytics fetch error:", error);
+    }
+  };
+
+  const triggerJiraIntegration = async () => {
+    try {
+      const response = await api.post("/api/analytics/jira/create-issue", {
+        summary: "Deploy PgBouncer Proxy Middleware for Connection Pooling",
+        description: "Prevent database connection pool exhaustion during flash sale events.",
+        priority: "High"
+      });
+      setJiraNotice(response.data);
+    } catch (error) {
+      console.error("Jira error:", error);
+    }
+  };
+
+  const triggerSlackIntegration = async () => {
+    try {
+      const response = await api.post("/api/analytics/slack/send-alert", {
+        title: "PostgreSQL Pool Exhaustion",
+        summary: "Unbounded db connection leak in payment checkout handler.",
+        root_cause: "Connection leak at payment.py line 245"
+      });
+      setSlackNotice(response.data);
+    } catch (error) {
+      console.error("Slack error:", error);
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Top Navbar */}
@@ -151,12 +194,12 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span className="brand-title">PostMortem-AI</span>
-              <span className="brand-badge" style={{ background: "rgba(168, 85, 247, 0.15)", color: "#c084fc", borderColor: "rgba(168, 85, 247, 0.3)" }}>
-                Part 4 Active (Prevention)
+              <span className="brand-badge" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#10b981", borderColor: "rgba(16, 185, 129, 0.4)" }}>
+                Part 5 Production Platform
               </span>
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>
-              AI Incident Intelligence, Git Root Cause, RAG Memory & Prevention Platform
+              Enterprise Incident Intelligence Platform (Auth, RAG, Integrations & Analytics)
             </div>
           </div>
         </div>
@@ -166,7 +209,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "postmortem" ? "active" : ""}`}
             onClick={() => setActiveTab("postmortem")}
           >
-            <span>⚡ Postmortem Generator</span>
+            <span>⚡ Postmortem</span>
           </button>
 
           <button
@@ -181,7 +224,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "memory" ? "active" : ""}`}
             onClick={() => setActiveTab("memory")}
           >
-            <span>🧠 Memory & RAG</span>
+            <span>🧠 RAG Memory</span>
             <span className="tab-badge">Part 3</span>
           </button>
 
@@ -190,21 +233,27 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             onClick={() => setActiveTab("prevention")}
           >
             <span>🛡️ Prevention Engine</span>
-            <span className="tab-badge" style={{ background: "#a855f7" }}>Part 4</span>
+            <span className="tab-badge">Part 4</span>
           </button>
 
           <button
             className={`nav-tab ${activeTab === "analytics" ? "active" : ""}`}
             onClick={() => setActiveTab("analytics")}
           >
-            <span>📊 Analytics</span>
-            <span className="tab-badge">Part 5</span>
+            <span>📊 Enterprise Analytics</span>
+            <span className="tab-badge" style={{ background: "#10b981" }}>Part 5</span>
           </button>
         </nav>
 
-        <div className="status-pill">
-          <div className="status-dot"></div>
-          <span>Engine & Prevention Engine Online</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ fontSize: "0.8rem", textAlign: "right" }}>
+            <div style={{ color: "#fff", fontWeight: "600" }}>{currentUser.name}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Role: {currentUser.role}</div>
+          </div>
+          <div className="status-pill">
+            <div className="status-dot"></div>
+            <span>Platform v5.0</span>
+          </div>
         </div>
       </header>
 
@@ -542,7 +591,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 4: Prevention Engine (Part 4 Core - Live Engine) */}
+        {/* TAB 4: Prevention Engine */}
         {activeTab === "prevention" && (
           <div>
             <div className="page-header">
@@ -602,7 +651,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               </button>
             </div>
 
-            {/* Generated Prevention Package Viewer */}
             {preventionPkg && (
               <div>
                 <div className="panel-header" style={{ marginBottom: "1rem" }}>
@@ -638,7 +686,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   </button>
                 </div>
 
-                {/* Sub tab: Test Code */}
                 {artifactTab === "test" && (
                   <div className="panel">
                     <div className="panel-header">
@@ -651,7 +698,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   </div>
                 )}
 
-                {/* Sub tab: Prometheus Alerts */}
                 {artifactTab === "alert" && (
                   <div className="panel">
                     <div className="panel-header">
@@ -664,7 +710,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   </div>
                 )}
 
-                {/* Sub tab: Runbook */}
                 {artifactTab === "runbook" && (
                   <div className="panel">
                     <div className="panel-header">
@@ -677,7 +722,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   </div>
                 )}
 
-                {/* Sub tab: Architecture Recommendations */}
                 {artifactTab === "rec" && preventionPkg.architecture_recommendation && (
                   <div className="panel" style={{ borderLeft: "4px solid #a855f7" }}>
                     <div className="panel-header">
@@ -708,31 +752,143 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 5: Analytics Dashboard (Part 5 Preview) */}
+        {/* TAB 5: Reliability Analytics & Enterprise Integrations (Part 5 Core) */}
         {activeTab === "analytics" && (
           <div>
             <div className="page-header">
-              <h1 className="page-title">Reliability Analytics Dashboard</h1>
+              <h1 className="page-title">Enterprise Reliability Analytics & Integrations</h1>
               <p className="page-subtitle">
-                Executive operational health metrics and MTTR trends (Part 5 Roadmap).
+                Executive operational health metrics, MTTR/MTBF tracking, microservice risk indices, and live Jira/Slack integrations.
               </p>
             </div>
 
-            <div className="grid-2" style={{ marginBottom: "1.5rem" }}>
-              <div className="panel" style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "800", color: "#818cf8" }}>18.4 mins</div>
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", textTransform: "uppercase" }}>
-                  Mean Time To Resolution (MTTR)
+            {/* KPI Metrics Header Cards */}
+            {analyticsData && (
+              <div className="grid-2" style={{ gridTemplateColumns: "1fr 1fr 1fr", marginBottom: "1.5rem" }}>
+                <div className="panel" style={{ textAlign: "center", background: "rgba(17, 24, 39, 0.95)" }}>
+                  <div style={{ fontSize: "2.2rem", fontWeight: "800", color: "#818cf8" }}>
+                    {analyticsData.mttr_minutes} mins
+                  </div>
+                  <div style={{ color: "var(--text-muted)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Mean Time To Resolution (MTTR)
+                  </div>
                 </div>
+
+                <div className="panel" style={{ textAlign: "center", background: "rgba(17, 24, 39, 0.95)" }}>
+                  <div style={{ fontSize: "2.2rem", fontWeight: "800", color: "#10b981" }}>
+                    {analyticsData.system_availability}%
+                  </div>
+                  <div style={{ color: "var(--text-muted)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    SLA Availability Target
+                  </div>
+                </div>
+
+                <div className="panel" style={{ textAlign: "center", background: "rgba(17, 24, 39, 0.95)" }}>
+                  <div style={{ fontSize: "2.2rem", fontWeight: "800", color: "#34d399" }}>
+                    {analyticsData.technical_debt_index?.score}/100
+                  </div>
+                  <div style={{ color: "var(--text-muted)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Tech Debt Risk ({analyticsData.technical_debt_index?.rating})
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Integrations Hub */}
+            <div className="panel" style={{ borderLeft: "4px solid #10b981" }}>
+              <div className="panel-header">
+                <h3 className="panel-title">🔌 Enterprise Integrations Hub</h3>
+                <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
+                  Live API Integrations Ready
+                </span>
               </div>
 
-              <div className="panel" style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "800", color: "#10b981" }}>99.94%</div>
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", textTransform: "uppercase" }}>
-                  System Availability
+              <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "1rem" }}>
+                Seamlessly push postmortem action items to Jira tickets and broadcast incident alerts to Slack channels.
+              </p>
+
+              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                <button
+                  className="btn-primary"
+                  style={{ background: "#2563eb" }}
+                  onClick={triggerJiraIntegration}
+                >
+                  🎟️ Auto-Generate Jira Ticket
+                </button>
+
+                <button
+                  className="btn-primary"
+                  style={{ background: "#4a154b" }}
+                  onClick={triggerSlackIntegration}
+                >
+                  💬 Broadcast Slack Block Kit Alert
+                </button>
+              </div>
+
+              {/* Jira Notice Response */}
+              {jiraNotice && (
+                <div className="ai-box" style={{ borderLeftColor: "#2563eb", marginTop: "1rem" }}>
+                  <div className="ai-box-title" style={{ color: "#60a5fa" }}>🎟️ Jira REST API Integration Result</div>
+                  <div><strong>{jiraNotice.message}</strong></div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                    Target URL: <code>{jiraNotice.payload?.jira_url}</code> | Priority: {jiraNotice.payload?.fields?.priority?.name}
+                  </div>
+                </div>
+              )}
+
+              {/* Slack Notice Response */}
+              {slackNotice && (
+                <div className="ai-box" style={{ borderLeftColor: "#4a154b", marginTop: "1rem" }}>
+                  <div className="ai-box-title" style={{ color: "#e879f9" }}>💬 Slack Block Kit Integration Result</div>
+                  <div><strong>{slackNotice.message}</strong></div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                    Broadcast Channel: <code>{slackNotice.payload?.channel}</code> | Blocks Generated: {slackNotice.payload?.blocks?.length}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Microservice Operational Health Table */}
+            {analyticsData && (
+              <div className="panel">
+                <div className="panel-header">
+                  <h3 className="panel-title">🛡️ Microservice Operational Health & MTTR</h3>
+                </div>
+
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-muted)" }}>
+                        <th style={{ padding: "0.75rem 1rem" }}>Service Name</th>
+                        <th style={{ padding: "0.75rem 1rem" }}>Status</th>
+                        <th style={{ padding: "0.75rem 1rem" }}>MTTR</th>
+                        <th style={{ padding: "0.75rem 1rem" }}>30-Day Incidents</th>
+                        <th style={{ padding: "0.75rem 1rem" }}>Risk Rating</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analyticsData.service_health?.map((svc, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
+                          <td style={{ padding: "0.75rem 1rem", fontWeight: "600" }}>{svc.name}</td>
+                          <td style={{ padding: "0.75rem 1rem" }}>
+                            <span className="diff-tag" style={{ background: svc.status === "Healthy" ? "rgba(16, 185, 129, 0.2)" : "rgba(245, 158, 11, 0.2)", color: svc.status === "Healthy" ? "#34d399" : "#fbbf24" }}>
+                              {svc.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: "0.75rem 1rem" }}>{svc.mttr}</td>
+                          <td style={{ padding: "0.75rem 1rem" }}>{svc.incidents_30d}</td>
+                          <td style={{ padding: "0.75rem 1rem" }}>
+                            <strong style={{ color: svc.risk_score === "Low" ? "#10b981" : "#f59e0b" }}>
+                              {svc.risk_score} Risk
+                            </strong>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </main>
