@@ -4,8 +4,29 @@ import json
 
 class LLMService:
 
-    def analyze_incident(self, incident_details: str):
+    def generate(self, prompt: str) -> str:
+        try:
+            response = chat(
+                model="qwen2.5:3b",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                format="json"
+            )
+            return response["message"]["content"]
+        except Exception as e:
+            print(f"Error invoking Ollama: {e}")
+            return json.dumps({
+                "confidence": 50,
+                "reason": "AI Service unavailable or failed to process commit diff.",
+                "evidence": ["Error during AI processing"],
+                "alternatives": []
+            })
 
+    def analyze_incident(self, incident_details: str):
         prompt = f"""
 You are a Senior Site Reliability Engineer.
 

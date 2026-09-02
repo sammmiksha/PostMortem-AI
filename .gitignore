@@ -1,0 +1,25 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python environments
+venv/
+env/
+ENV/
+
+# Databases
+*.db
+*.sqlite3
+
+# Node dependencies
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log

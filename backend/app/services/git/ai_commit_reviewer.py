@@ -1,5 +1,5 @@
 import json
-from app.services.ai.llm_service import LLMService  # Fixed import path based on your folder structure
+from app.services.llm_service import LLMService
 
 class AICommitReviewer:
 

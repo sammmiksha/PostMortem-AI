@@ -1,0 +1,331 @@
+cat << 'PROMPT' > /mnt/user-data/outputs/PostMortem_Autopilot_Full_Prompt.md
+# PostMortem Autopilot — Full Hackathon Project Prompt
+### IBM Bob Hackathon 2025 · Complete Specification Document
+
+---
+
+## 🧠 Project Name
+**PostMortem Autopilot**
+*Turn production incidents from fire drills into institutional learning — automatically, with IBM Bob.*
+
+---
+
+## 🎯 Hackathon Challenge Alignment
+
+**Challenge Theme:** Turn idea into impact faster — *Get up to speed on existing code quickly, Generate documentation and tests, Reduce effort spent on repetitive tasks that slow your team down.*
+
+**IBM Bob Usage:** Central to every step. This is not a project that uses Bob as a sidebar — Bob IS the engine. Every automated action, every analysis, every document generated runs through Bob's agentic framework, BobShell playbooks, and multi-model orchestration.
+
+---
+
+## 🔥 The Real-World Problem
+
+### Context
+Every software team — from 5-person startups to IBM-scale enterprises — experiences production incidents. Servers go down, APIs break, deployments fail. But the most damaging part isn't the downtime itself. It's what happens in the 24–72 hours after.
+
+### What Currently Happens (The Pain)
+When an incident is resolved, the on-call engineer must:
+1. Manually reconstruct the incident timeline from scattered logs, Slack messages, and memory
+2. Dig through git history to find the root-cause commit — often across hundreds of recent PRs
+3. Write a structured postmortem document from scratch (summary, timeline, impact, root cause, action items)
+4. Manually file each action item as a Jira/Linear ticket with appropriate priority and ownership
+5. Cross-reference with past incidents — usually by searching Confluence manually, if at all
+6. Get the document reviewed and published, often days after the incident
+
+### The Numbers (Industry Data)
+- **8–12 hours per postmortem** spent by senior engineers on manual documentation
+- **69% of developers** report spending at least 8 hours per week on technical debt (including incident aftermath)
+- **20% of their workweek** disappears into firefighting and documentation instead of building
+- **23–42% of development time** is wasted dealing with technical debt consequences
+- Teams with unmanaged recurring incidents see **30–50% slower release cycles** than those who actively track patterns
+- **40% of technical debt incidents** arise from the same class of bugs re-appearing because lessons weren't institutionalized
+
+### The Root Cause of the Problem
+Postmortems are not being written because engineers are lazy — they're not being written well because:
+- The cognitive load of reconstructing an incident while still mentally exhausted from it is enormous
+- No tool reads the codebase with enough context to trace a bug to its introducing commit automatically
+- Action items get buried in documents nobody revisits
+- There is no systematic cross-referencing of incidents — institutional knowledge lives in senior engineers' heads and leaves when they do
+- Tooling exists for creating postmortem *templates* (Blameless, FireHydrant) but none that *fills them in* using code and repo intelligence
+
+### The Consequence
+Teams are doomed to repeat the same class of incidents every quarter. The same architectural mistake, the same untested edge case, the same deployment anti-pattern — appearing in disguise under a different ticket number.
+
+---
+
+## 💡 The Solution: PostMortem Autopilot
+
+### One-Line Definition
+A Bob-powered CLI + dashboard that triggers automatically when a production alert fires, reads the full repository context, traces the incident to its root commit, generates a structured postmortem draft, creates prioritized Jira tickets, and cross-references incident history to surface recurring failure patterns — all before the on-call engineer has finished their first coffee.
+
+### Core Insight
+IBM Bob is the only tool capable of doing this because it is the only AI development partner that:
+- Reads full repository context (not just a file or a snippet)
+- Orchestrates multiple specialized agents simultaneously
+- Generates documentation, tests, and code changes in one workflow
+- Produces a self-documenting audit trail via BobShell (critical for compliance)
+- Has built-in security scanning to flag if the incident touched sensitive code paths
+
+No other tool — not Copilot, not Cursor, not Claude Code, not Blameless — combines all five.
+
+---
+
+## 🏗️ Architecture & How It Works
+
+### Trigger Layer
+- Webhook integration with **PagerDuty** or **Opsgenie**
+- When a P1/P2 alert is resolved (or manually triggered mid-incident), PostMortem Autopilot activates
+- Receives: incident ID, affected services, alert timestamp, duration, alert description
+
+### Automated Pipeline (6 Stages)
+
+```
+Incident fires → Bob reads repo → Root cause trace → Draft generated → Tickets filed → Pattern alert
+```
+
+#### Stage 1 — Incident Signal Capture
+- Pulls structured data from PagerDuty/Opsgenie API: timeline, affected service, runbook links, responders
+- Pulls recent deployment history from CI/CD (GitHub Actions / Jenkins / Tekton)
+- Pulls relevant log excerpts from observability platform (Datadog / Splunk / OpenSearch)
+
+#### Stage 2 — Bob Reads the Full Repo (Architect Mode)
+- Bob ingests the entire repository with full codebase context
+- Identifies all services, modules, and dependencies touched by the failing service
+- Maps the call graph, data flow, and failure blast radius
+- This is the step no other tool can do — Bob understands the *system*, not just the file
+
+#### Stage 3 — Root Cause Trace (Agentic, BobShell)
+A BobShell playbook orchestrates three specialized sub-agents in parallel:
+
+- **Agent A — Git Archaeologist:** Runs `git log`, `git blame`, and `git bisect`-style analysis to identify the introducing commit. Cross-references the commit with PR description, reviewer, and CI results at merge time.
+- **Agent B — Pattern Matcher:** Scans the diff of the root commit against Bob's knowledge of known anti-patterns, insecure constructs (via Semgrep), and previously seen failure signatures in the incident history store.
+- **Agent C — Log Correlator:** Aligns log timestamps with deployment events, feature flag changes, and config updates to produce a precise incident timeline with causal links, not just a list of events.
+
+All agent actions are logged in real time by BobShell — every step is traceable and auditable.
+
+#### Stage 4 — Postmortem Draft Generation (Bob Code Mode)
+Bob generates a fully structured postmortem document in your team's preferred format (Confluence, Markdown, Notion template) containing:
+
+1. **Incident Summary** — Plain-English description of what broke, when, how long, and user impact
+2. **Root Commit Link** — Exact PR/commit hash that introduced the regression, with author, merge date, and reviewer
+3. **Timeline Reconstruction** — Auto-assembled from logs, alert timestamps, deploy history, and responder actions
+4. **Impact Quantification** — Estimated users affected, revenue impact window, SLA breach calculation
+5. **Contributing Factors** — Structural reasons why the bug wasn't caught (missing test, skipped review, no monitoring on this path)
+6. **Action Items with Owners** — Prioritized, specific, assigned fix list (not vague "improve testing")
+7. **Prevention Playbook** — Specific tests and monitoring rules Bob writes to catch this exact bug class next time
+
+#### Stage 5 — Jira/Linear Auto-Filing
+- Each action item from Stage 4 is automatically filed as a Jira ticket
+- Bob assigns: priority label (P1/P2/P3), suggested owner (based on git ownership of affected module), epic link, sprint suggestion
+- Zero action items fall through the cracks
+- Tickets contain a direct link back to the postmortem section that generated them
+
+#### Stage 6 — Pattern Detection & Institutional Memory
+- A vector store (pgvector / Pinecone) holds embeddings of all past postmortems
+- Bob's multi-model routing uses a lightweight model for similarity search and Claude for nuanced root cause comparison
+- If the current incident matches a prior pattern (same module, same failure class, same contributing factor), Bob surfaces: "⚠️ This is the 3rd incident in 90 days rooted in the authentication middleware. Recommended: architectural review."
+- This alert goes to the engineering manager, not just the on-call
+
+---
+
+## 🤖 IBM Bob's Specific Role — Feature-by-Feature
+
+| Capability Used | Bob Feature | What It Does in This Project |
+|---|---|---|
+| Full repo context reading | Bob Architect Mode | Understands the entire system at incident time — not just the failing file |
+| Multi-agent orchestration | Agentic Workflows | Runs Git, Pattern, and Log agents in parallel, coordinates results |
+| Documentation generation | Bob Code Mode | Drafts the full postmortem, timeline, and action items |
+| Test writing | Bob + Semgrep inline scanning | Writes regression tests and Semgrep rules to prevent recurrence |
+| Self-documenting audit trail | BobShell | Every automated action logged in real time — auditable for HIPAA/PCI/FedRAMP |
+| Security scanning | Built-in Semgrep | Flags if incident touched code paths with sensitive data handling |
+| Multi-model routing | Claude + Granite + Mistral | Similarity search on lightweight model, nuanced analysis on frontier model |
+| Human-in-the-loop | Bob approval model | Postmortem and Jira tickets go out only after engineer reviews and approves |
+| Reusable playbooks | BobShell recipes | The entire workflow is a reusable, version-controlled BobShell script |
+
+---
+
+## 👥 Team Roles & Responsibilities
+
+### Role 1 — Bob Integration Engineer
+**Responsibility:** Build and maintain the BobShell playbook that orchestrates the entire pipeline.
+- Write the BobShell script that triggers on webhook, invokes each agent, and collects output
+- Configure Bob's Architect Mode prompts for repo ingestion
+- Set up human-in-the-loop approval checkpoints before any external action (Jira filing, document publishing)
+- Ensure all agentic steps are logged and auditable
+- **Skills needed:** BobShell scripting, API integration, prompt engineering for Bob
+
+### Role 2 — Backend / Data Engineer
+**Responsibility:** Build the data pipeline that feeds Bob with the right context.
+- PagerDuty/Opsgenie webhook listener
+- Log ingestion from Datadog/Splunk/OpenSearch
+- Git history analysis API wrapper (`git log`, `git blame`, `git diff`)
+- Vector store setup for incident pattern memory (pgvector or Pinecone)
+- Jira/Linear API integration for ticket auto-filing
+- **Skills needed:** Python/Node.js, REST APIs, vector databases, git internals
+
+### Role 3 — Frontend / Dashboard Engineer
+**Responsibility:** Build the incident pattern dashboard and postmortem review UI.
+- Pattern detection dashboard showing recurring incident categories across 90 days
+- Postmortem review UI where engineers approve, edit, and publish Bob's draft
+- Incident timeline visualizer
+- Action item tracker linked to Jira
+- **Skills needed:** React/Next.js, data visualization, REST API consumption
+
+### Role 4 — ML / Prompt Engineer
+**Responsibility:** Tune Bob's output quality and the pattern detection system.
+- Design and iterate on prompts for each of the three sub-agents
+- Build the postmortem template injection system (so Bob writes in your team's exact format)
+- Tune the vector similarity thresholds for pattern detection (avoid false positives)
+- Evaluate postmortem quality against human-written benchmarks
+- **Skills needed:** Prompt engineering, LLM evaluation, embedding models
+
+### Role 5 — DevOps / Demo Engineer
+**Responsibility:** Make the proof-of-concept demoable and infrastructure-ready.
+- Set up mock incident environment (fake PagerDuty webhook, sample repo with known bug)
+- Deploy the POC to a cloud environment for live demo
+- Record fallback demo video in case of live demo issues
+- Prepare the BobShell script output for judges to inspect (showing auditability)
+- **Skills needed:** Docker, cloud deployment, CI/CD, demo scripting
+
+---
+
+## 📦 Proof-of-Concept Scope (Hackathon Deliverables)
+
+### MVP 1 — BobShell Playbook (Core Demo)
+A reusable BobShell script that:
+- Accepts a mock incident log + repo path as input
+- Invokes Bob to read the repo in Architect Mode
+- Runs the three sub-agents sequentially (Git, Pattern, Log)
+- Outputs a structured postmortem draft in Markdown
+
+**Demo:** Live terminal run showing BobShell self-documenting every step. Judges can see the audit trail.
+
+### MVP 2 — Root Commit Tracer
+A Bob agent that:
+- Takes a failure signature (error message + affected file) as input
+- Runs `git log` + `git blame` analysis with Bob's full repo context
+- Returns the introducing commit, PR link, and author
+- Explains *why* this commit caused the issue (not just which one)
+
+**Demo:** Show the same bug traced to its commit in under 60 seconds on a sample repo.
+
+### MVP 3 — Auto Jira Filer
+Generated action items from the postmortem automatically filed as Jira tickets with:
+- Priority label (P1/P2/P3) assigned by Bob based on impact assessment
+- Suggested owner (based on git module ownership)
+- Link back to postmortem section
+
+**Demo:** Show Jira board before and after autopilot runs. Tickets appear with correct metadata.
+
+### MVP 4 — Pattern Detection Dashboard
+A simple React dashboard showing:
+- Recurring incident categories detected by Bob across mock incident history
+- "You've had 3 incidents in this module in 90 days" alerts
+- Recommended architectural review flags
+
+**Demo:** Show the dashboard surfacing a pattern from 5 mock postmortems. Show Bob's explanation of the pattern.
+
+---
+
+## 🆚 Competitive Differentiation
+
+| Tool | What It Does | What It Doesn't Do |
+|---|---|---|
+| Blameless / FireHydrant | Postmortem templates, incident timelines | Does NOT read the codebase. Humans still write all the content. |
+| GitHub Copilot | Code suggestions in-editor | Cannot read 200k lines of repo context, trace git history, and write tests simultaneously |
+| PagerDuty | Alert management, on-call scheduling | No code intelligence whatsoever |
+| Datadog | Log analysis, monitoring | No repo context, no postmortem generation |
+| Confluence AI | Document summarization | Cannot analyze code or trace commits |
+| **PostMortem Autopilot + Bob** | **All of the above, automated, end-to-end** | — |
+
+**The unique combination that only Bob enables:**
+1. Full repo context at incident time (Architect Mode)
+2. Multi-agent orchestration in one auditable workflow (BobShell)
+3. Documentation + code (tests) generated in the same session (Code Mode)
+4. Built-in security scanning of affected code paths (Semgrep)
+5. Human-in-the-loop approval before any external action (Bob approval model)
+6. Self-documenting audit trail for compliance (BobShell logging)
+
+---
+
+## 📈 Projected Impact
+
+| Metric | Before PostMortem Autopilot | After |
+|---|---|---|
+| Time to postmortem draft | 8–12 hours | ~11 minutes |
+| Action items filed to Jira | ~60% (rest forgotten) | 100% |
+| Recurring incidents caught | Ad hoc / never | Automatic, within 90-day window |
+| Compliance audit readiness | Manual log reconstruction | BobShell audit trail auto-generated |
+| On-call engineer cognitive load | Extreme (memory + writing + ticketing) | Review + approve only |
+| Junior engineer postmortem quality | Inconsistent, often incomplete | Consistent, Bob-generated, mentor-quality |
+
+---
+
+## 🗺️ Roadmap Beyond the Hackathon
+
+### Phase 1 — Hackathon POC (Days 1–2)
+- BobShell playbook for postmortem generation
+- Root commit tracer
+- Mock Jira integration
+- Pattern dashboard (mock data)
+
+### Phase 2 — Beta (Weeks 1–4)
+- Live PagerDuty/Opsgenie webhook integration
+- Real Jira/Linear filing
+- Multi-repo support
+- Postmortem template customization per team
+
+### Phase 3 — Production (Months 2–3)
+- Slack/Teams bot: "Your postmortem is ready for review" notification
+- Confluence/Notion auto-publish
+- SLA breach auto-calculation
+- Multi-language repo support (Java, Python, Go, Node)
+- IBM Bob Premium for Z integration — extend to mainframe incident postmortems
+
+### Phase 4 — Enterprise Scale (Months 4–6)
+- Cross-team pattern detection (org-wide incident intelligence)
+- Engineering manager weekly digest: "Top 3 recurring failure patterns this month"
+- Integration with IBM Instana for automatic observability correlation
+- FedRAMP/HIPAA/PCI compliance report generation from BobShell audit logs
+
+---
+
+## 🏆 Why This Wins
+
+1. **Bob is not optional** — Every core feature requires Bob's specific capabilities. Judges can immediately see this is not a generic AI project with Bob bolted on.
+
+2. **Real pain, real numbers** — 69% of developers waste 8+ hours/week on incident aftermath. This is not a hypothetical problem.
+
+3. **Live demoable in 2 minutes** — Run BobShell on a sample repo with a mock incident. Judges watch a postmortem appear in real time. That's the demo.
+
+4. **Scales from a solo developer to IBM enterprise** — Works for a 5-person startup and satisfies FedRAMP compliance for a government contractor.
+
+5. **Nobody has built this** — Not Blameless, not FireHydrant, not GitHub, not Datadog. The combination of repo intelligence + incident analysis + documentation + test generation in one Bob-orchestrated workflow is genuinely novel.
+
+6. **Directly uses Bob's differentiating features** — Full repo context, BobShell, multi-agent orchestration, Semgrep scanning, human-in-the-loop, multi-model routing. This project is almost a showcase of everything Bob uniquely does.
+
+---
+
+## 📋 Quick Reference Summary
+
+| Element | Detail |
+|---|---|
+| **Project name** | PostMortem Autopilot |
+| **Problem** | 8–12 hrs wasted per incident postmortem; recurring bugs from zero institutional memory |
+| **Solution** | Bob-powered auto-generation of postmortems, root cause traces, Jira tickets, and prevention tests |
+| **Bob features used** | Architect Mode, Code Mode, BobShell, Semgrep, Multi-agent, Multi-model routing, Human-in-the-loop |
+| **Trigger** | PagerDuty/Opsgenie webhook |
+| **Output** | Postmortem draft, Jira tickets, regression tests, Semgrep rules, pattern alert |
+| **POC deliverables** | BobShell playbook, root commit tracer, Jira filer, pattern dashboard |
+| **Unique advantage** | Only tool combining full repo context + incident analysis + doc generation + test writing |
+| **Target users** | On-call engineers, engineering managers, DevOps, compliance teams |
+| **Compliance ready** | BobShell audit trail satisfies HIPAA, PCI, FedRAMP requirements |
+
+---
+
+*Generated for IBM Bob Hackathon 2025 · PostMortem Autopilot*
+PROMPT
+echo "Done"
+Output
+
+Done

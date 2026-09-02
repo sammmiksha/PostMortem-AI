@@ -47,7 +47,7 @@ Teams can submit incidents and receive structured AI-generated reports stored in
 
 ---
 
-# Phase 2 — Intelligent Postmortem Generation 🚧
+# Phase 2 — Git Root Cause Analyzer ✅ Completed
 
 ### Goal
 
