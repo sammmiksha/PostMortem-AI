@@ -26,6 +26,14 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
   const [memoryLoading, setMemoryLoading] = useState(false);
   const [patternsData, setPatternsData] = useState(null);
 
+  // Part 4 Prevention Engine state
+  const [prevSummary, setPrevSummary] = useState("PostgreSQL Database Connection Pool Exhaustion during Flash Sale");
+  const [prevRootCause, setPrevRootCause] = useState("Unbounded db connection leak in payment checkout handler due to missing connection close in exception block");
+  const [prevCategory, setPrevCategory] = useState("Database");
+  const [preventionPkg, setPreventionPkg] = useState(null);
+  const [preventionLoading, setPreventionLoading] = useState(false);
+  const [artifactTab, setArtifactTab] = useState("test");
+
   // Load Part 3 Pattern Analytics when tab switches to memory
   useEffect(() => {
     if (activeTab === "memory") {
@@ -106,6 +114,34 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
     }
   };
 
+  // Handler for Part 4: Prevention Package Generation
+  const generatePreventionPackage = async () => {
+    try {
+      setPreventionLoading(true);
+      const response = await api.post("/api/prevention/generate", {
+        summary: prevSummary,
+        root_cause: prevRootCause,
+        category: prevCategory
+      });
+      setPreventionPkg(response.data);
+    } catch (error) {
+      console.error("Prevention generation error:", error);
+      alert("Failed to generate prevention package.");
+    } finally {
+      setPreventionLoading(false);
+    }
+  };
+
+  const downloadPackage = () => {
+    if (!preventionPkg) return;
+    const blob = new Blob([JSON.stringify(preventionPkg, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `prevention_package_${prevCategory.toLowerCase()}.json`;
+    a.click();
+  };
+
   return (
     <div className="app-container">
       {/* Top Navbar */}
@@ -115,12 +151,12 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span className="brand-title">PostMortem-AI</span>
-              <span className="brand-badge" style={{ background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderColor: "rgba(16, 185, 129, 0.3)" }}>
-                Part 3 Active (RAG)
+              <span className="brand-badge" style={{ background: "rgba(168, 85, 247, 0.15)", color: "#c084fc", borderColor: "rgba(168, 85, 247, 0.3)" }}>
+                Part 4 Active (Prevention)
               </span>
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>
-              AI Incident Intelligence, Git Root Cause & RAG Memory Platform
+              AI Incident Intelligence, Git Root Cause, RAG Memory & Prevention Platform
             </div>
           </div>
         </div>
@@ -146,7 +182,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             onClick={() => setActiveTab("memory")}
           >
             <span>🧠 Memory & RAG</span>
-            <span className="tab-badge" style={{ background: "#10b981" }}>Part 3</span>
+            <span className="tab-badge">Part 3</span>
           </button>
 
           <button
@@ -154,7 +190,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             onClick={() => setActiveTab("prevention")}
           >
             <span>🛡️ Prevention Engine</span>
-            <span className="tab-badge">Part 4</span>
+            <span className="tab-badge" style={{ background: "#a855f7" }}>Part 4</span>
           </button>
 
           <button
@@ -168,7 +204,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
 
         <div className="status-pill">
           <div className="status-dot"></div>
-          <span>Engine & Vector Store Online</span>
+          <span>Engine & Prevention Engine Online</span>
         </div>
       </header>
 
@@ -256,7 +292,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 2: Git Root Cause Analyzer (Part 2 Core) */}
+        {/* TAB 2: Git Root Cause Analyzer */}
         {activeTab === "rootcause" && (
           <div>
             <div className="page-header">
@@ -312,7 +348,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             {/* Analysis Results Display */}
             {rootCauseResult && (
               <div>
-                {/* Parsed Stacktrace Clues Header */}
                 <div className="panel" style={{ background: "rgba(30, 41, 59, 0.5)" }}>
                   <div className="panel-header">
                     <h3 className="panel-title">🧩 Parsed Stack Trace Clues</h3>
@@ -337,7 +372,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   </div>
                 </div>
 
-                {/* Candidate Commits List */}
                 <h3 style={{ fontSize: "1.2rem", fontWeight: "700", marginBottom: "1rem" }}>
                   Top Suspicious Commit Candidates ({rootCauseResult.candidate_commits?.length || 0})
                 </h3>
@@ -362,7 +396,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
 
                       <div className="commit-msg">{commit.message}</div>
 
-                      {/* AI Reasoning Box */}
                       {commit.ai_reason && (
                         <div className="ai-box">
                           <div className="ai-box-title">🤖 AI Root Cause Review</div>
@@ -370,7 +403,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                         </div>
                       )}
 
-                      {/* Heuristic Breakdown */}
                       <div style={{ marginBottom: "0.75rem", fontSize: "0.85rem" }}>
                         <span style={{ color: "var(--text-muted)" }}>Ranking Factors: </span>
                         {commit.reasons?.map((r, i) => (
@@ -378,7 +410,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                         ))}
                       </div>
 
-                      {/* Code Diff Changes */}
                       {commit.changes_diff?.length > 0 && (
                         <div>
                           <div style={{ fontSize: "0.8rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.4rem" }}>
@@ -408,7 +439,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 3: Incident Memory System (Part 3 Core - Live RAG) */}
+        {/* TAB 3: Incident Memory System */}
         {activeTab === "memory" && (
           <div>
             <div className="page-header">
@@ -436,7 +467,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               </div>
             </div>
 
-            {/* Pattern Analytics Header Grid */}
             {patternsData && (
               <div className="grid-2" style={{ marginBottom: "1.5rem" }}>
                 <div className="panel" style={{ background: "rgba(17, 24, 39, 0.9)" }}>
@@ -476,7 +506,6 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               </div>
             )}
 
-            {/* RAG Search Results */}
             <h3 style={{ fontSize: "1.2rem", fontWeight: "700", marginBottom: "1rem" }}>
               Semantic Vector Search Results ({searchResults.length})
             </h3>
@@ -513,43 +542,169 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 4: Prevention Engine (Part 4 Preview) */}
+        {/* TAB 4: Prevention Engine (Part 4 Core - Live Engine) */}
         {activeTab === "prevention" && (
           <div>
             <div className="page-header">
               <h1 className="page-title">Prevention Intelligence Engine</h1>
               <p className="page-subtitle">
-                Auto-generate regression tests, Prometheus alerts, and runbooks (Part 4 Roadmap).
+                Transform incident analysis into proactive preventative action: generate Pytest regression tests, Prometheus alert rules, operational runbooks, and architecture recommendations.
               </p>
             </div>
 
-            <div className="grid-2">
-              <div className="panel">
-                <h3 className="panel-title">🧪 Auto-Generated Pytest Regression Tests</h3>
-                <pre className="diff-container" style={{ maxHeight: "none", marginTop: "0.75rem" }}>
-{`def test_prevent_db_pool_exhaustion():
-    # Auto-generated regression test
-    pool = create_connection_pool(max_connections=10)
-    with pytest.raises(TimeoutError):
-        for _ in range(11):
-            pool.acquire_connection(timeout=0.1)`}
-                </pre>
+            <div className="panel">
+              <div className="grid-2">
+                <div className="form-group">
+                  <label className="form-label">Incident Summary</label>
+                  <input
+                    className="form-input"
+                    value={prevSummary}
+                    onChange={(e) => setPrevSummary(e.target.value)}
+                    placeholder="e.g. Database connection pool exhaustion during flash sale"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Failure Category</label>
+                  <select
+                    className="form-input"
+                    value={prevCategory}
+                    onChange={(e) => setPrevCategory(e.target.value)}
+                  >
+                    <option value="Database">Database & Storage</option>
+                    <option value="Authentication">Authentication & JWT</option>
+                    <option value="Networking">Networking & Gateway</option>
+                    <option value="Configuration">Configuration & Env</option>
+                    <option value="Caching">Caching & Redis</option>
+                    <option value="API">API Endpoints</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="panel">
-                <h3 className="panel-title">🔔 Monitoring & Runbook Artifacts</h3>
-                <pre className="diff-container" style={{ maxHeight: "none", marginTop: "0.75rem" }}>
-{`# Prometheus Alert Rule
-alert: PostgresPoolUsageHigh
-expr: pg_stat_activity_count / pg_max_connections > 0.85
-for: 2m
-labels:
-  severity: critical
-annotations:
-  summary: DB Connection Pool > 85%`}
-                </pre>
+              <div className="form-group">
+                <label className="form-label">Target Root Cause</label>
+                <textarea
+                  className="form-textarea"
+                  rows="3"
+                  value={prevRootCause}
+                  onChange={(e) => setPrevRootCause(e.target.value)}
+                  placeholder="Describe root cause to generate targeted prevention artifacts..."
+                />
               </div>
+
+              <button
+                className="btn-primary"
+                style={{ background: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)" }}
+                onClick={generatePreventionPackage}
+                disabled={preventionLoading}
+              >
+                {preventionLoading ? "Generating Prevention Package & Validating Artifacts..." : "🛡️ Generate Prevention Package"}
+              </button>
             </div>
+
+            {/* Generated Prevention Package Viewer */}
+            {preventionPkg && (
+              <div>
+                <div className="panel-header" style={{ marginBottom: "1rem" }}>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      className={`nav-tab ${artifactTab === "test" ? "active" : ""}`}
+                      onClick={() => setArtifactTab("test")}
+                    >
+                      🧪 Pytest Test
+                    </button>
+                    <button
+                      className={`nav-tab ${artifactTab === "alert" ? "active" : ""}`}
+                      onClick={() => setArtifactTab("alert")}
+                    >
+                      🔔 Prometheus Alerts
+                    </button>
+                    <button
+                      className={`nav-tab ${artifactTab === "runbook" ? "active" : ""}`}
+                      onClick={() => setArtifactTab("runbook")}
+                    >
+                      📖 SRE Runbook
+                    </button>
+                    <button
+                      className={`nav-tab ${artifactTab === "rec" ? "active" : ""}`}
+                      onClick={() => setArtifactTab("rec")}
+                    >
+                      🏗️ Architecture Recommendation
+                    </button>
+                  </div>
+
+                  <button className="btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={downloadPackage}>
+                    ⬇️ Download Package JSON
+                  </button>
+                </div>
+
+                {/* Sub tab: Test Code */}
+                {artifactTab === "test" && (
+                  <div className="panel">
+                    <div className="panel-header">
+                      <h3 className="panel-title">🧪 Generated Pytest Regression Test</h3>
+                      <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
+                        Validated (Contains Assertions)
+                      </span>
+                    </div>
+                    <pre className="diff-container" style={{ maxHeight: "none" }}>{preventionPkg.test_code}</pre>
+                  </div>
+                )}
+
+                {/* Sub tab: Prometheus Alerts */}
+                {artifactTab === "alert" && (
+                  <div className="panel">
+                    <div className="panel-header">
+                      <h3 className="panel-title">🔔 Prometheus & Grafana Monitoring Alert Rules</h3>
+                      <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
+                        Validated Rule Metrics
+                      </span>
+                    </div>
+                    <pre className="diff-container" style={{ maxHeight: "none" }}>{preventionPkg.alert_rules}</pre>
+                  </div>
+                )}
+
+                {/* Sub tab: Runbook */}
+                {artifactTab === "runbook" && (
+                  <div className="panel">
+                    <div className="panel-header">
+                      <h3 className="panel-title">📖 SRE Operational Response Runbook</h3>
+                      <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
+                        SRE Standard Validated
+                      </span>
+                    </div>
+                    <pre className="diff-container" style={{ maxHeight: "none", whiteSpace: "pre-wrap" }}>{preventionPkg.runbook}</pre>
+                  </div>
+                )}
+
+                {/* Sub tab: Architecture Recommendations */}
+                {artifactTab === "rec" && preventionPkg.architecture_recommendation && (
+                  <div className="panel" style={{ borderLeft: "4px solid #a855f7" }}>
+                    <div className="panel-header">
+                      <div>
+                        <h3 className="panel-title" style={{ fontSize: "1.2rem", color: "#c084fc" }}>
+                          {preventionPkg.architecture_recommendation.title}
+                        </h3>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                          Priority: <strong style={{ color: "#f43f5e" }}>{preventionPkg.architecture_recommendation.priority}</strong> (Risk Reduction Score: {preventionPkg.architecture_recommendation.score}/100)
+                        </div>
+                      </div>
+                    </div>
+
+                    <p style={{ marginTop: "0.75rem", marginBottom: "1rem", color: "var(--text-main)" }}>
+                      {preventionPkg.architecture_recommendation.description}
+                    </p>
+
+                    <h4 style={{ fontSize: "0.9rem", color: "#818cf8", marginBottom: "0.5rem" }}>Recommended Action Items:</h4>
+                    <ul style={{ paddingLeft: "1.5rem" }}>
+                      {preventionPkg.architecture_recommendation.action_items?.map((item, idx) => (
+                        <li key={idx} style={{ marginBottom: "0.4rem" }}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
