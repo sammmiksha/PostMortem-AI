@@ -25,7 +25,7 @@ Enable teams to:
 
 # Product Evolution Roadmap
 
-## Phase 1 — Foundation Platform ✅ Completed
+## Phase 1 — Foundation Platform [Completed]
 
 ### Goal
 
@@ -47,7 +47,7 @@ Teams can submit incidents and receive structured AI-generated reports stored in
 
 ---
 
-# Phase 2 — Git Root Cause Analyzer ✅ Completed
+# Phase 2 — Git Root Cause Analyzer [Completed]
 
 ### Goal
 
@@ -98,7 +98,7 @@ PostMortem-AI becomes a true AI-assisted postmortem tool.
 
 ---
 
-# Phase 3 — Incident Memory System (RAG + Knowledge Base) ✅ Completed
+# Phase 3 — Incident Memory System (RAG + Knowledge Base) [Completed]
 
 ### Goal
 
@@ -137,7 +137,7 @@ Institutional knowledge is preserved even when team members leave.
 
 ---
 
-# Phase 4 — Prevention Intelligence Engine ✅ Completed
+# Phase 4 — Prevention Intelligence Engine [Completed]
 
 ### Goal
 
@@ -176,7 +176,7 @@ Data-driven reliability improvements.
 
 ---
 
-# Phase 5 — Production Platform & Enterprise Readiness ✅ Completed
+# Phase 5 — Production Platform & Enterprise Readiness [Completed]
 
 ### Goal
 

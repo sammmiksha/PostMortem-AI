@@ -12,14 +12,14 @@ class SlackService:
         """Formats a Slack Block Kit payload for incident alert broadcast."""
         return {
             "channel": channel,
-            "text": f"🚨 PostMortem-AI Alert: {title}",
+            "text": f"PostMortem-AI Alert: {title}",
             "blocks": [
                 {
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": f"🚨 PostMortem-AI Analysis Ready: {title}",
-                        "emoji": True
+                        "text": f"PostMortem-AI Analysis Ready: {title}",
+                        "emoji": False
                     }
                 },
                 {

@@ -209,14 +209,14 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "postmortem" ? "active" : ""}`}
             onClick={() => setActiveTab("postmortem")}
           >
-            <span>⚡ Postmortem</span>
+            <span>Postmortem</span>
           </button>
 
           <button
             className={`nav-tab ${activeTab === "rootcause" ? "active" : ""}`}
             onClick={() => setActiveTab("rootcause")}
           >
-            <span>🔍 Git Root Cause</span>
+            <span>Git Root Cause</span>
             <span className="tab-badge">Part 2</span>
           </button>
 
@@ -224,7 +224,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "memory" ? "active" : ""}`}
             onClick={() => setActiveTab("memory")}
           >
-            <span>🧠 RAG Memory</span>
+            <span>RAG Memory</span>
             <span className="tab-badge">Part 3</span>
           </button>
 
@@ -232,7 +232,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "prevention" ? "active" : ""}`}
             onClick={() => setActiveTab("prevention")}
           >
-            <span>🛡️ Prevention Engine</span>
+            <span>Prevention Engine</span>
             <span className="tab-badge">Part 4</span>
           </button>
 
@@ -240,7 +240,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             className={`nav-tab ${activeTab === "analytics" ? "active" : ""}`}
             onClick={() => setActiveTab("analytics")}
           >
-            <span>📊 Enterprise Analytics</span>
+            <span>Enterprise Analytics</span>
             <span className="tab-badge" style={{ background: "#10b981" }}>Part 5</span>
           </button>
         </nav>
@@ -296,14 +296,14 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                 onClick={analyzeIncident}
                 disabled={reportLoading}
               >
-                {reportLoading ? "Analyzing Incident with AI..." : "⚡ Generate AI Postmortem"}
+                {reportLoading ? "Analyzing Incident with AI..." : "Generate AI Postmortem"}
               </button>
             </div>
 
             {report && report.report && (
               <div className="panel" style={{ borderLeft: "4px solid #6366f1" }}>
                 <div className="panel-header">
-                  <h2 className="panel-title">📄 AI Generated Postmortem Report</h2>
+                  <h2 className="panel-title">AI Generated Postmortem Report</h2>
                   <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
                     Report ID: #{report.id}
                   </span>
@@ -390,7 +390,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                 onClick={runRootCauseAnalysis}
                 disabled={rootCauseLoading}
               >
-                {rootCauseLoading ? "Scanning Repository & Analyzing Commits..." : "🔍 Investigate Root Cause Commits"}
+                {rootCauseLoading ? "Scanning Repository & Analyzing Commits..." : "Investigate Root Cause Commits"}
               </button>
             </div>
 
@@ -399,7 +399,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               <div>
                 <div className="panel" style={{ background: "rgba(30, 41, 59, 0.5)" }}>
                   <div className="panel-header">
-                    <h3 className="panel-title">🧩 Parsed Stack Trace Clues</h3>
+                    <h3 className="panel-title">Parsed Stack Trace Clues</h3>
                   </div>
                   <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", fontSize: "0.9rem" }}>
                     <div>
@@ -447,7 +447,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
 
                       {commit.ai_reason && (
                         <div className="ai-box">
-                          <div className="ai-box-title">🤖 AI Root Cause Review</div>
+                          <div className="ai-box-title">AI Root Cause Review</div>
                           <div>{commit.ai_reason}</div>
                         </div>
                       )}
@@ -510,7 +510,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                     onKeyDown={(e) => e.key === "Enter" && runMemorySearch()}
                   />
                   <button className="btn-primary" style={{ whiteSpace: "nowrap" }} onClick={runMemorySearch} disabled={memoryLoading}>
-                    {memoryLoading ? "Searching Vectors..." : "🔍 Search RAG Memory"}
+                    {memoryLoading ? "Searching Vectors..." : "Search RAG Memory"}
                   </button>
                 </div>
               </div>
@@ -520,7 +520,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               <div className="grid-2" style={{ marginBottom: "1.5rem" }}>
                 <div className="panel" style={{ background: "rgba(17, 24, 39, 0.9)" }}>
                   <div className="panel-header">
-                    <h3 className="panel-title">🧠 Knowledge Base Memory Stats</h3>
+                    <h3 className="panel-title">Knowledge Base Memory Stats</h3>
                   </div>
                   <div style={{ display: "flex", gap: "2rem", marginTop: "0.5rem" }}>
                     <div>
@@ -540,7 +540,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
 
                 <div className="panel" style={{ background: "rgba(17, 24, 39, 0.9)" }}>
                   <div className="panel-header">
-                    <h3 className="panel-title">📊 Failure Category Distribution</h3>
+                    <h3 className="panel-title">Failure Category Distribution</h3>
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
                     {Object.entries(patternsData.category_counts || {}).map(([cat, count], i) => (
@@ -647,7 +647,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                 onClick={generatePreventionPackage}
                 disabled={preventionLoading}
               >
-                {preventionLoading ? "Generating Prevention Package & Validating Artifacts..." : "🛡️ Generate Prevention Package"}
+                {preventionLoading ? "Generating Prevention Package & Validating Artifacts..." : "Generate Prevention Package"}
               </button>
             </div>
 
@@ -659,37 +659,37 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                       className={`nav-tab ${artifactTab === "test" ? "active" : ""}`}
                       onClick={() => setArtifactTab("test")}
                     >
-                      🧪 Pytest Test
+                      Pytest Test
                     </button>
                     <button
                       className={`nav-tab ${artifactTab === "alert" ? "active" : ""}`}
                       onClick={() => setArtifactTab("alert")}
                     >
-                      🔔 Prometheus Alerts
+                      Prometheus Alerts
                     </button>
                     <button
                       className={`nav-tab ${artifactTab === "runbook" ? "active" : ""}`}
                       onClick={() => setArtifactTab("runbook")}
                     >
-                      📖 SRE Runbook
+                      SRE Runbook
                     </button>
                     <button
                       className={`nav-tab ${artifactTab === "rec" ? "active" : ""}`}
                       onClick={() => setArtifactTab("rec")}
                     >
-                      🏗️ Architecture Recommendation
+                      Architecture Recommendation
                     </button>
                   </div>
 
                   <button className="btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={downloadPackage}>
-                    ⬇️ Download Package JSON
+                    Download Package JSON
                   </button>
                 </div>
 
                 {artifactTab === "test" && (
                   <div className="panel">
                     <div className="panel-header">
-                      <h3 className="panel-title">🧪 Generated Pytest Regression Test</h3>
+                      <h3 className="panel-title">Generated Pytest Regression Test</h3>
                       <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
                         Validated (Contains Assertions)
                       </span>
@@ -701,7 +701,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                 {artifactTab === "alert" && (
                   <div className="panel">
                     <div className="panel-header">
-                      <h3 className="panel-title">🔔 Prometheus & Grafana Monitoring Alert Rules</h3>
+                      <h3 className="panel-title">Prometheus & Grafana Monitoring Alert Rules</h3>
                       <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
                         Validated Rule Metrics
                       </span>
@@ -713,7 +713,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                 {artifactTab === "runbook" && (
                   <div className="panel">
                     <div className="panel-header">
-                      <h3 className="panel-title">📖 SRE Operational Response Runbook</h3>
+                      <h3 className="panel-title">SRE Operational Response Runbook</h3>
                       <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
                         SRE Standard Validated
                       </span>
@@ -752,7 +752,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 5: Reliability Analytics & Enterprise Integrations (Part 5 Core) */}
+        {/* TAB 5: Reliability Analytics & Enterprise Integrations */}
         {activeTab === "analytics" && (
           <div>
             <div className="page-header">
@@ -797,7 +797,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             {/* Integrations Hub */}
             <div className="panel" style={{ borderLeft: "4px solid #10b981" }}>
               <div className="panel-header">
-                <h3 className="panel-title">🔌 Enterprise Integrations Hub</h3>
+                <h3 className="panel-title">Enterprise Integrations Hub</h3>
                 <span className="diff-tag" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34d399" }}>
                   Live API Integrations Ready
                 </span>
@@ -813,7 +813,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   style={{ background: "#2563eb" }}
                   onClick={triggerJiraIntegration}
                 >
-                  🎟️ Auto-Generate Jira Ticket
+                  Auto-Generate Jira Ticket
                 </button>
 
                 <button
@@ -821,14 +821,14 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
                   style={{ background: "#4a154b" }}
                   onClick={triggerSlackIntegration}
                 >
-                  💬 Broadcast Slack Block Kit Alert
+                  Broadcast Slack Block Kit Alert
                 </button>
               </div>
 
               {/* Jira Notice Response */}
               {jiraNotice && (
                 <div className="ai-box" style={{ borderLeftColor: "#2563eb", marginTop: "1rem" }}>
-                  <div className="ai-box-title" style={{ color: "#60a5fa" }}>🎟️ Jira REST API Integration Result</div>
+                  <div className="ai-box-title" style={{ color: "#60a5fa" }}>Jira REST API Integration Result</div>
                   <div><strong>{jiraNotice.message}</strong></div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
                     Target URL: <code>{jiraNotice.payload?.jira_url}</code> | Priority: {jiraNotice.payload?.fields?.priority?.name}
@@ -839,7 +839,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
               {/* Slack Notice Response */}
               {slackNotice && (
                 <div className="ai-box" style={{ borderLeftColor: "#4a154b", marginTop: "1rem" }}>
-                  <div className="ai-box-title" style={{ color: "#e879f9" }}>💬 Slack Block Kit Integration Result</div>
+                  <div className="ai-box-title" style={{ color: "#e879f9" }}>Slack Block Kit Integration Result</div>
                   <div><strong>{slackNotice.message}</strong></div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
                     Broadcast Channel: <code>{slackNotice.payload?.channel}</code> | Blocks Generated: {slackNotice.payload?.blocks?.length}
@@ -852,7 +852,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             {analyticsData && (
               <div className="panel">
                 <div className="panel-header">
-                  <h3 className="panel-title">🛡️ Microservice Operational Health & MTTR</h3>
+                  <h3 className="panel-title">Microservice Operational Health & MTTR</h3>
                 </div>
 
                 <div style={{ overflowX: "auto" }}>
