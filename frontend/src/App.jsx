@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "./services/api";
 
 function App() {
@@ -20,8 +20,19 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
   const [rootCauseResult, setRootCauseResult] = useState(null);
   const [rootCauseLoading, setRootCauseLoading] = useState(false);
 
-  // Part 3 RAG Search state
-  const [searchQuery, setSearchQuery] = useState("");
+  // Part 3 RAG Search & Pattern state
+  const [searchQuery, setSearchQuery] = useState("Database connection pool timeout during peak traffic");
+  const [searchResults, setSearchResults] = useState([]);
+  const [memoryLoading, setMemoryLoading] = useState(false);
+  const [patternsData, setPatternsData] = useState(null);
+
+  // Load Part 3 Pattern Analytics when tab switches to memory
+  useEffect(() => {
+    if (activeTab === "memory") {
+      fetchPatterns();
+      runMemorySearch();
+    }
+  }, [activeTab]);
 
   // Handler for Part 1: Incident Analysis
   const analyzeIncident = async () => {
@@ -70,6 +81,31 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
     }
   };
 
+  // Handler for Part 3: Memory Vector RAG Search
+  const runMemorySearch = async () => {
+    try {
+      setMemoryLoading(true);
+      const response = await api.post("/api/memory/search", {
+        query: searchQuery,
+        top_k: 5
+      });
+      setSearchResults(response.data.results || []);
+    } catch (error) {
+      console.error("Memory search error:", error);
+    } finally {
+      setMemoryLoading(false);
+    }
+  };
+
+  const fetchPatterns = async () => {
+    try {
+      const response = await api.get("/api/memory/patterns");
+      setPatternsData(response.data);
+    } catch (error) {
+      console.error("Pattern fetch error:", error);
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Top Navbar */}
@@ -79,10 +115,12 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span className="brand-title">PostMortem-AI</span>
-              <span className="brand-badge">Part 2 Active</span>
+              <span className="brand-badge" style={{ background: "rgba(16, 185, 129, 0.15)", color: "#34d399", borderColor: "rgba(16, 185, 129, 0.3)" }}>
+                Part 3 Active (RAG)
+              </span>
             </div>
             <div style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>
-              AI Incident Intelligence & Git Root Cause Platform
+              AI Incident Intelligence, Git Root Cause & RAG Memory Platform
             </div>
           </div>
         </div>
@@ -108,7 +146,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
             onClick={() => setActiveTab("memory")}
           >
             <span>🧠 Memory & RAG</span>
-            <span className="tab-badge">Part 3</span>
+            <span className="tab-badge" style={{ background: "#10b981" }}>Part 3</span>
           </button>
 
           <button
@@ -130,7 +168,7 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
 
         <div className="status-pill">
           <div className="status-dot"></div>
-          <span>Engine Online</span>
+          <span>Engine & Vector Store Online</span>
         </div>
       </header>
 
@@ -370,48 +408,108 @@ RuntimeError: ConnectionTimeoutError: Failed to connect to PostgreSQL database p
           </div>
         )}
 
-        {/* TAB 3: Incident Memory System (Part 3 Preview & Architecture) */}
+        {/* TAB 3: Incident Memory System (Part 3 Core - Live RAG) */}
         {activeTab === "memory" && (
           <div>
             <div className="page-header">
-              <h1 className="page-title">Incident Memory System (RAG)</h1>
+              <h1 className="page-title">Incident Memory System (RAG + Knowledge Base)</h1>
               <p className="page-subtitle">
-                Semantic vector search and pattern detection engine (Part 3 Roadmap).
+                Retrieve historical incidents using natural language semantic vector search & detect recurring failure patterns across system memory.
               </p>
             </div>
 
             <div className="panel">
               <div className="form-group">
-                <label className="form-label">Semantic Memory Search</label>
+                <label className="form-label">Semantic Memory Vector Search</label>
                 <div style={{ display: "flex", gap: "0.75rem" }}>
                   <input
                     className="form-input"
-                    placeholder="e.g. Show all database connection pool exhaustion incidents..."
+                    placeholder="e.g. Database connection pool exhaustion during high traffic spike..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && runMemorySearch()}
                   />
-                  <button className="btn-primary" style={{ whiteSpace: "nowrap" }}>
-                    🔍 Search Vector Memory
+                  <button className="btn-primary" style={{ whiteSpace: "nowrap" }} onClick={runMemorySearch} disabled={memoryLoading}>
+                    {memoryLoading ? "Searching Vectors..." : "🔍 Search RAG Memory"}
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid-2">
-              <div className="panel">
-                <h3 className="panel-title">📌 Historical Incident Vector Store</h3>
-                <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
-                  Powered by <code>pgvector</code> and <code>all-MiniLM-L6-v2</code> (384d embeddings). Stores key root causes, resolutions, and affected services.
-                </p>
-              </div>
+            {/* Pattern Analytics Header Grid */}
+            {patternsData && (
+              <div className="grid-2" style={{ marginBottom: "1.5rem" }}>
+                <div className="panel" style={{ background: "rgba(17, 24, 39, 0.9)" }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">🧠 Knowledge Base Memory Stats</h3>
+                  </div>
+                  <div style={{ display: "flex", gap: "2rem", marginTop: "0.5rem" }}>
+                    <div>
+                      <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#6366f1" }}>
+                        {patternsData.total_incidents}
+                      </div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Stored Incidents</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#f43f5e" }}>
+                        {patternsData.patterns?.length || 0}
+                      </div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Recurring Risk Trends</div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="panel">
-                <h3 className="panel-title">🔁 Automated Pattern Detection</h3>
-                <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
-                  Discovers recurring failure modes across 90-day windows (Database, Auth, Networking, Config) to prevent repeat fires.
-                </p>
+                <div className="panel" style={{ background: "rgba(17, 24, 39, 0.9)" }}>
+                  <div className="panel-header">
+                    <h3 className="panel-title">📊 Failure Category Distribution</h3>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+                    {Object.entries(patternsData.category_counts || {}).map(([cat, count], i) => (
+                      count > 0 && (
+                        <div key={i} className="diff-tag" style={{ background: "rgba(99, 102, 241, 0.15)", color: "#a5b4fc", padding: "0.4rem 0.75rem" }}>
+                          <strong>{cat}:</strong> {count}
+                        </div>
+                      )
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* RAG Search Results */}
+            <h3 style={{ fontSize: "1.2rem", fontWeight: "700", marginBottom: "1rem" }}>
+              Semantic Vector Search Results ({searchResults.length})
+            </h3>
+
+            {searchResults.map((item, idx) => (
+              <div key={idx} className="commit-card" style={{ borderLeft: "4px solid #6366f1" }}>
+                <div className="commit-header">
+                  <div>
+                    <span className="diff-tag" style={{ background: "rgba(99, 102, 241, 0.2)", color: "#818cf8" }}>
+                      {item.service} Service
+                    </span>
+                    <span className="diff-tag">{item.error_type}</span>
+                  </div>
+                  <div className="badge-confidence low" style={{ background: "rgba(99, 102, 241, 0.15)", color: "#818cf8", borderColor: "rgba(99, 102, 241, 0.3)" }}>
+                    <span>{item.similarity_score}% Vector Similarity</span>
+                  </div>
+                </div>
+
+                <div className="commit-msg" style={{ marginTop: "0.5rem" }}>{item.summary}</div>
+
+                <div className="grid-2" style={{ marginTop: "0.75rem" }}>
+                  <div className="ai-box" style={{ borderLeftColor: "#f43f5e" }}>
+                    <div className="ai-box-title" style={{ color: "#f43f5e" }}>Historical Root Cause</div>
+                    <div style={{ fontSize: "0.875rem" }}>{item.root_cause}</div>
+                  </div>
+
+                  <div className="ai-box" style={{ borderLeftColor: "#10b981" }}>
+                    <div className="ai-box-title" style={{ color: "#10b981" }}>Proven Resolution</div>
+                    <div style={{ fontSize: "0.875rem" }}>{item.resolution}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
